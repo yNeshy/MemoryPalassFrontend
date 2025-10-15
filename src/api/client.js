@@ -1,3 +1,6 @@
+// NOTE: Do NOT call React hooks (like useAuth) at module scope. Components should
+// obtain tokens via hooks and pass them to these functions when needed.
+
 // Mock auth implementation used by settings.jsx
 const auth = {
   // Simulate fetching current user
@@ -56,7 +59,47 @@ const entities = {
   }
 };
 
+const BASE_URL = 'http://localhost:8000/api';
+
+const api = {
+    // ask(question, token?) - token should be passed from a component that has access to Clerk's useAuth
+    ask: async (question, token = null) => {
+      const url = BASE_URL + '/memory?' + new URLSearchParams({ question }).toString();
+      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+      const response = await fetch(url, { headers, method: 'GET' });
+
+      if (!response.ok) {
+        throw new Error(`Failed to get answer: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.answer;
+    },
+
+    // store(fact, token?) - token should be passed from the caller
+    store: async (fact, token = null) => {
+      const url = BASE_URL + '/memory';
+      const headers = {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        'Content-Type': 'application/json',
+      };
+
+      const response = await fetch(url, {
+        headers,
+        method: 'POST',
+        body: JSON.stringify({ text: fact }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to store fact: ${response.status}`);
+      }
+
+      return await response.json();
+    },
+}
+
 export const palassapi = {
   auth,
   entities,
+  api,
 };

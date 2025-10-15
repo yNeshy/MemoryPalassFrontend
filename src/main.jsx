@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import HomePage from './Pages/Home';
+import HomePage from './Pages/home';
 import MemoryPage from './Pages/memory';
 import SettingsPage from './Pages/settings';
 import Layout from './layout';
