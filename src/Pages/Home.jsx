@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/client";
+import { palassapi } from "@/api/client";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Brain, Save, Sparkles } from "lucide-react";
@@ -53,7 +54,11 @@ export default function Home() {
     return await response.json();
   };
 
-  const { data: facts = [] } = base44.entities.Fact.list();  
+  const { data: facts } = useQuery({
+    queryKey: ['facts'],
+    queryFn: () => palassapi.entities.Fact.list(),
+    initialData: [],
+  });
 
   // Adjust character size based on number of facts
   useEffect(() => {
@@ -77,7 +82,7 @@ export default function Home() {
       if (response) {
         setFeedbackMessage("✨ Palass learned something new!");
         // Refresh the facts list by re-fetching
-        await base44.entities.Fact.list();
+        await palassapi.entities.Fact.list();
       } else {
         setFeedbackMessage("❌ Failed to store the fact: No response from server");
       }
