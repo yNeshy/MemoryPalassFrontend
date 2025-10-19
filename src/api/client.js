@@ -1,28 +1,6 @@
 // NOTE: Do NOT call React hooks (like useAuth) at module scope. Components should
 // obtain tokens via hooks and pass them to these functions when needed.
 
-// Mock auth implementation used by settings.jsx
-const auth = {
-  // Simulate fetching current user
-  me: async () => {
-    // In a real implementation this would call an API.
-    // Return a mock user object that matches what's used in settings.jsx
-    return {
-      id: 1,
-      full_name: "Nechi",
-      email: "aziz.nechi.pro@gmail.com",
-      role: "admin",
-    };
-  },
-
-  // Simulate logout
-  logout: () => {
-    // In real app, you'd clear tokens / call API. For now just log.
-    console.log("palassapi.auth.logout() called - mock logout executed");
-  }
-};
-
-// Reuse existing entities from src/client.js and ensure create/list/delete exist
 const entities = {
   Fact: {
     list: async () => {
@@ -97,6 +75,33 @@ const api = {
       return await response.json();
     },
 }
+
+const auth = {
+  // Simulate fetching current user
+  me: async () => {
+    const url = BASE_URL + '/me';
+      const headers = {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        'Content-Type': 'application/json',
+      };
+
+      const response = await fetch(url, {
+        headers,
+        method: 'GET',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user: ${response.status}`);
+      }
+
+      data = await response.json();
+      return {
+        'email': data.email,
+        'is_admin': data.is_admin,
+        'name': data.first_name + ' ' + data.last_name
+      }
+  }
+};
 
 export const palassapi = {
   auth,

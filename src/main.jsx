@@ -7,7 +7,7 @@ import SettingsPage from './Pages/settings';
 import Layout from './layout';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ClerkProvider } from '@clerk/clerk-react'
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, SignIn, UserButton } from '@clerk/clerk-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 // Import your Publishable Key
@@ -38,7 +38,10 @@ createRoot(document.getElementById('root')).render(
           </SignedIn>
 
           <SignedOut>
-            <SignInButton />
+            {/* Render Clerk's full SignIn UI when the user is not signed in */}
+            <div className="min-h-screen flex items-center justify-center p-6">
+              <SignIn path="/" routing="path" signUpUrl="/" />
+            </div>
           </SignedOut>
 
           <SignedIn>

@@ -16,6 +16,8 @@ import {
   Shield
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from '@clerk/clerk-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Settings() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -40,8 +42,18 @@ export default function Settings() {
     initialData: null,
   });
 
-  const handleLogout = () => {
-    palassapi.auth.logout();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      // optional: call palassapi logout mock (no-op) for consistency
+      try { palassapi.auth.logout(); } catch (e) { /* ignore */ }
+      navigate('/');
+    } catch (err) {
+      console.error('Logout failed', err);
+    }
   };
 
   const handleSupport = () => {
@@ -96,7 +108,7 @@ export default function Settings() {
                       </div>
                     </div>
                   </div>
-                  {user.role === 'admin' && (
+                  {user.is_admin === true && (
                     <div className="flex items-center gap-2 px-3 py-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg w-fit">
                       <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                       <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
